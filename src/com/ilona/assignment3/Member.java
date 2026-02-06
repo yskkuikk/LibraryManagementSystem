@@ -3,12 +3,10 @@ package com.ilona.assignment3;
 public class Member {
     private int id;
     private String name;
-    private String contactInfo;
 
-    public Member(int id, String name, String contactInfo) {
+    public Member(int id, String name) {
         this.id = id;
         this.name = name;
-        this.contactInfo = contactInfo;
     }
 
     public int getId() {
@@ -18,9 +16,4 @@ public class Member {
     public String getName() {
         return name;
     }
-
-    public String getContactInfo() {
-        return contactInfo;
-    }
 }
-

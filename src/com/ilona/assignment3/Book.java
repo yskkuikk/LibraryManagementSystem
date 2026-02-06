@@ -6,11 +6,11 @@ public class Book {
     private String author;
     private boolean available;
 
-    public Book(int id, String title, String author, boolean available) {
+    public Book(int id, String title, String author) {
         this.id = id;
         this.title = title;
         this.author = author;
-        this.available = available;
+        this.available = true;
     }
 
     public int getId() {
@@ -21,15 +21,20 @@ public class Book {
         return title;
     }
 
-    public String getAuthor() {
-        return author;
-    }
-
     public boolean isAvailable() {
         return available;
     }
 
-    public void setAvailable(boolean available) {
-        this.available = available;
+    public void borrowBook() {
+        available = false;
+    }
+
+    public void returnBook() {
+        available = true;
+    }
+
+    @Override
+    public String toString() {
+        return id + " | " + title + " | " + author + " | Available: " + available;
     }
 }

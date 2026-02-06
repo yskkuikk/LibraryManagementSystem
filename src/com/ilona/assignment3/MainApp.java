@@ -1,59 +1,85 @@
 package com.ilona.assignment3;
 
-import java.util.ArrayList;
 import java.util.Scanner;
 
 public class MainApp {
 
-    private static ArrayList<Book> books = new ArrayList<>();
-    private static ArrayList<Member> members = new ArrayList<>();
+    private DatabaseManager db = new DatabaseManager();
+    private Scanner scanner = new Scanner(System.in);
 
-    public static void start() {
-        Scanner scanner = new Scanner(System.in);
+    public void start() {
+        boolean running = true;
 
-        System.out.println("=== Library Management System ===");
-        System.out.println("1. Add Book");
-        System.out.println("2. View Books");
-        System.out.println("3. Add Member");
-        System.out.println("4. Exit");
+        while (running) {
+            System.out.println("\n=== Library Management System ===");
+            System.out.println("1. Add Book");
+            System.out.println("2. View Books");
+            System.out.println("3. Add Member");
+            System.out.println("4. Borrow Book");
+            System.out.println("5. Return Book");
+            System.out.println("6. Exit");
+            System.out.print("Choose option: ");
 
-        int choice = scanner.nextInt();
-        scanner.nextLine();
+            int choice = scanner.nextInt();
 
-        switch (choice) {
-            case 1:
-                System.out.print("Title: ");
-                String title = scanner.nextLine();
-                System.out.print("Author: ");
-                String author = scanner.nextLine();
-                books.add(new Book(books.size() + 1, title, author, true));
-                System.out.println("Book added.");
-                break;
-
-            case 2:
-                for (Book book : books) {
-                    System.out.println(book.getId() + ". " + book.getTitle() +
-                            " by " + book.getAuthor() +
-                            " | Available: " + book.isAvailable());
+            switch (choice) {
+                case 1 -> addBook();
+                case 2 -> viewBooks();
+                case 3 -> addMember();
+                case 4 -> borrowBook();
+                case 5 -> returnBook();
+                case 6 -> {
+                    running = false;
+                    System.out.println("Goodbye!");
                 }
-                break;
-
-            case 3:
-                System.out.print("Name: ");
-                String name = scanner.nextLine();
-                System.out.print("Contact info: ");
-                String contact = scanner.nextLine();
-                members.add(new Member(members.size() + 1, name, contact));
-                System.out.println("Member added.");
-                break;
-
-            case 4:
-                System.out.println("Exiting...");
-                break;
-
-            default:
-                System.out.println("Invalid option.");
+                default -> System.out.println("Invalid option.");
+            }
         }
     }
-}
 
+    private void addBook() {
+        System.out.print("Book ID: ");
+        int id = scanner.nextInt();
+        scanner.nextLine();
+        System.out.print("Title: ");
+        String title = scanner.nextLine();
+        System.out.print("Author: ");
+        String author = scanner.nextLine();
+
+        db.addBook(new Book(id, title, author));
+        System.out.println("Book added successfully.");
+    }
+
+    private void viewBooks() {
+        for (Book book : db.getBooks()) {
+            System.out.println(book);
+        }
+    }
+
+    private void addMember() {
+        System.out.print("Member ID: ");
+        int id = scanner.nextInt();
+        scanner.nextLine();
+        System.out.print("Name: ");
+        String name = scanner.nextLine();
+
+        db.addMember(new Member(id, name));
+        System.out.println("Member added successfully.");
+    }
+
+    private void borrowBook() {
+        System.out.print("Book ID: ");
+        int bookId = scanner.nextInt();
+        System.out.print("Member ID: ");
+        int memberId = scanner.nextInt();
+
+        db.borrowBook(bookId, memberId);
+    }
+
+    private void returnBook() {
+        System.out.print("Book ID: ");
+        int bookId = scanner.nextInt();
+
+        db.returnBook(bookId);
+    }
+}
