@@ -1,23 +1,34 @@
 package com.ilona.assignment3;
 
-import java.time.LocalDate;
+import java.util.Date;
 
 public class BorrowRecord {
-    private int bookId;
-    private int memberId;
-    private LocalDate borrowDate;
+    private Member member;
+    private Book book;
+    private Date borrowDate;
+    private Date returnDate;
 
-    public BorrowRecord(int bookId, int memberId) {
-        this.bookId = bookId;
-        this.memberId = memberId;
-        this.borrowDate = LocalDate.now();
+    public BorrowRecord(Member member, Book book) {
+        this.member = member;
+        this.book = book;
+        this.borrowDate = new Date();
+        this.returnDate = null;
     }
 
-    @Override
-    public String toString() {
-        return "Book ID: " + bookId +
-                ", Member ID: " + memberId +
-                ", Borrowed on: " + borrowDate;
+    public Book getBook() { return book; }
+    public Member getMember() { return member; }
+    public Date getBorrowDate() { return borrowDate; }
+    public Date getReturnDate() { return returnDate; }
+
+    public void returnBook() {
+        this.returnDate = new Date();
+        book.returned();
+    }
+
+    public void display() {
+        System.out.println("Member: " + member.getName() +
+                ", Book: " + book.getTitle() +
+                ", Borrowed: " + borrowDate +
+                ", Returned: " + (returnDate != null ? returnDate : "Not returned"));
     }
 }
-
