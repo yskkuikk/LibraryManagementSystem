@@ -1,162 +1,226 @@
 package com.ilona.assignment3;
 
-import java.util.ArrayList;
 import java.util.Scanner;
 
 public class MainApp {
-    private ArrayList<Book> books = new ArrayList<>();
-    private ArrayList<Member> members = new ArrayList<>();
-    private ArrayList<BorrowRecord> records = new ArrayList<>();
-    private Scanner scanner = new Scanner(System.in);
+
+    Scanner scanner = new Scanner(System.in);
 
     public void start() {
-        Member librarian = new Member(1, "Admin", "admin@mail.com", "Librarian");
-        Member memberUser = new Member(2, "Ilona", "john@mail.com", "Member");
 
-        members.add(librarian);
-        members.add(memberUser);
+        while (true) {
 
-        System.out.println("Welcome to Library Management System");
-        System.out.print("Enter username: ");
-        String inputName = scanner.nextLine();
-        Member currentUser = null;
+            System.out.println("\n===== Library Management System =====");
+            System.out.println("1 - Admin");
+            System.out.println("2 - Member");
+            System.out.println("3 - Exit");
 
-        for (Member m : members) {
-            if (m.getName().equalsIgnoreCase(inputName)) {
-                currentUser = m;
+            int choice = scanner.nextInt();
+            scanner.nextLine();
+
+            if (choice == 1) {
+                adminLogin();
+            } else if (choice == 2) {
+                memberMenu();
+            } else {
                 break;
             }
         }
+    }
 
-        if (currentUser == null) {
-            System.out.println("User not found.");
+    private void adminLogin() {
+
+        System.out.println("Enter admin password:");
+        String pass = scanner.nextLine();
+
+        if (!pass.equals("676767")) {
+            System.out.println("Wrong password.");
             return;
         }
 
-        System.out.println("Logged in as: " + currentUser.getRole());
-
-        if (currentUser.getRole().equalsIgnoreCase("Librarian")) {
-            librarianMenu(currentUser);
-        } else {
-            memberMenu(currentUser);
-        }
-    }
-
-    private void librarianMenu(Member currentUser) {
         while (true) {
-            System.out.println("\n--- Librarian Menu ---");
-            System.out.println("1. Add Book");
-            System.out.println("2. View Books");
-            System.out.println("3. Add Member");
-            System.out.println("4. Borrow Book");
-            System.out.println("5. Return Book");
-            System.out.println("6. Exit");
 
-            int choice = Integer.parseInt(scanner.nextLine());
-            switch (choice) {
-                case 1:
-                    addBook();
-                    break;
-                case 2:
-                    viewBooks();
-                    break;
-                case 3:
-                    addMember();
-                    break;
-                case 4:
-                    borrowBook(currentUser);
-                    break;
-                case 5:
-                    returnBook();
-                    break;
-                case 6:
-                    return;
+            System.out.println("\n--- ADMIN MENU ---");
+            System.out.println("1 - Add Book");
+            System.out.println("2 - View Books");
+            System.out.println("3 - View Members");
+            System.out.println("4 - View Borrow Records");
+            System.out.println("5 - Back");
+
+            int choice = scanner.nextInt();
+            scanner.nextLine();
+
+            if (choice == 1) {
+                addBook();
+            } else if (choice == 2) {
+                viewBooks();
+            } else if (choice == 3) {
+                viewMembers();
+            } else if (choice == 4) {
+                viewRecords();
+            } else {
+                break;
             }
         }
     }
 
-    private void memberMenu(Member currentUser) {
-        while (true) {
-            System.out.println("\n--- Member Menu ---");
-            System.out.println("1. View Books");
-            System.out.println("2. Borrow Book");
-            System.out.println("3. Return Book");
-            System.out.println("4. Exit");
+    private void memberMenu() {
 
-            int choice = Integer.parseInt(scanner.nextLine());
-            switch (choice) {
-                case 1:
-                    viewBooks();
-                    break;
-                case 2:
-                    borrowBook(currentUser);
-                    break;
-                case 3:
-                    returnBook();
-                    break;
-                case 4:
-                    return;
+        System.out.println("\n1 - Register");
+        System.out.println("2 - Login");
+
+        int choice = scanner.nextInt();
+        scanner.nextLine();
+
+        if (choice == 1) {
+            registerMember();
+        } else {
+            loginMember();
+        }
+    }
+
+    private void registerMember() {
+
+        System.out.println("Enter ID:");
+        int id = scanner.nextInt();
+        scanner.nextLine();
+
+        if (DatabaseManager.findMember(id) != null) {
+            System.out.println("Member with this ID already exists.");
+            return;
+        }
+
+        System.out.println("Enter Name:");
+        String name = scanner.nextLine();
+
+        System.out.println("Enter Password:");
+        String password = scanner.nextLine();
+
+        Member m = new Member(id, name, password);
+        DatabaseManager.addMember(m);
+
+        System.out.println("Registration successful.");
+    }
+
+    private void loginMember() {
+
+        System.out.println("Enter ID:");
+        int id = scanner.nextInt();
+        scanner.nextLine();
+
+        System.out.println("Enter Password:");
+        String pass = scanner.nextLine();
+
+        Member m = DatabaseManager.findMember(id);
+
+        if (m == null || !m.getPassword().equals(pass)) {
+            System.out.println("Invalid login.");
+            return;
+        }
+
+        while (true) {
+
+            System.out.println("\n--- MEMBER MENU ---");
+            System.out.println("1 - View Books");
+            System.out.println("2 - Borrow Book");
+            System.out.println("3 - Return Book");
+            System.out.println("4 - Back");
+
+            int choice = scanner.nextInt();
+            scanner.nextLine();
+
+            if (choice == 1) {
+                viewBooks();
+            } else if (choice == 2) {
+                borrowBook(m);
+            } else if (choice == 3) {
+                returnBook(m);
+            } else {
+                break;
             }
         }
     }
 
     private void addBook() {
-        System.out.print("Enter book ID: ");
-        int id = Integer.parseInt(scanner.nextLine());
-        System.out.print("Enter title: ");
+
+        System.out.println("Enter Book ID:");
+        int id = scanner.nextInt();
+        scanner.nextLine();
+
+        if (DatabaseManager.findBook(id) != null) {
+            System.out.println("Book with this ID already exists.");
+            return;
+        }
+
+        System.out.println("Enter Title:");
         String title = scanner.nextLine();
-        System.out.print("Enter author: ");
+
+        System.out.println("Enter Author:");
         String author = scanner.nextLine();
-        books.add(new Book(id, title, author));
-        System.out.println("Book added.");
+
+        Book b = new Book(id, title, author);
+        DatabaseManager.addBook(b);
+
+        System.out.println("Book added successfully.");
     }
 
     private void viewBooks() {
-        for (Book b : books) b.display();
+        for (Book b : DatabaseManager.books) {
+            System.out.println(b);
+        }
     }
 
-    private void addMember() {
-        System.out.print("Enter member ID: ");
-        int id = Integer.parseInt(scanner.nextLine());
-        System.out.print("Enter name: ");
-        String name = scanner.nextLine();
-        System.out.print("Enter contact: ");
-        String contact = scanner.nextLine();
-        System.out.print("Enter role (Member/Librarian): ");
-        String role = scanner.nextLine();
-        members.add(new Member(id, name, contact, role));
-        System.out.println("Member added.");
+    private void viewMembers() {
+        for (Member m : DatabaseManager.members) {
+            System.out.println(m);
+        }
     }
 
-    private void borrowBook(Member currentUser) {
-        System.out.print("Enter book ID to borrow: ");
-        int bid = Integer.parseInt(scanner.nextLine());
-        Book borrowBook = null;
-        for (Book b : books) if (b.getId() == bid) borrowBook = b;
-        if (borrowBook == null || !borrowBook.isAvailable()) {
+    private void viewRecords() {
+        for (BorrowRecord r : DatabaseManager.records) {
+            System.out.println(r);
+        }
+    }
+
+    private void borrowBook(Member m) {
+
+        System.out.println("Enter Book ID:");
+        int id = scanner.nextInt();
+        scanner.nextLine();
+
+        Book b = DatabaseManager.findBook(id);
+
+        if (b == null) {
+            System.out.println("Book not found.");
+            return;
+        }
+
+        if (!b.isAvailable()) {
             System.out.println("Book not available.");
-        } else {
-            records.add(new BorrowRecord(currentUser, borrowBook));
-            borrowBook.borrow();
-            System.out.println("Book borrowed.");
+            return;
         }
+
+        b.setAvailable(false);
+        DatabaseManager.records.add(new BorrowRecord(m, b));
+
+        System.out.println("Book borrowed successfully.");
     }
 
-    private void returnBook() {
-        System.out.print("Enter book ID to return: ");
-        int rid = Integer.parseInt(scanner.nextLine());
-        BorrowRecord recordToReturn = null;
-        for (BorrowRecord r : records) {
-            if (r.getBook().getId() == rid && r.getReturnDate() == null) {
-                recordToReturn = r;
-                break;
-            }
+    private void returnBook(Member m) {
+
+        System.out.println("Enter Book ID:");
+        int id = scanner.nextInt();
+        scanner.nextLine();
+
+        Book b = DatabaseManager.findBook(id);
+
+        if (b == null) {
+            System.out.println("Book not found.");
+            return;
         }
-        if (recordToReturn != null) {
-            recordToReturn.returnBook();
-            System.out.println("Book returned.");
-        } else {
-            System.out.println("Borrow record not found.");
-        }
+
+        b.setAvailable(true);
+
+        System.out.println("Book returned successfully.");
     }
 }
