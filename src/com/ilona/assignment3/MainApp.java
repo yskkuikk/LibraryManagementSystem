@@ -66,8 +66,8 @@ public class MainApp {
 
     private void memberMenu() {
 
-        System.out.println("\n1 - Register");
-        System.out.println("2 - Login");
+        System.out.println("\n1 - Sign up");
+        System.out.println("2 - Sign in");
 
         int choice = scanner.nextInt();
         scanner.nextLine();
@@ -99,7 +99,7 @@ public class MainApp {
         Member m = new Member(id, name, password);
         DatabaseManager.addMember(m);
 
-        System.out.println("Registration successful.");
+        System.out.println("Sign up successful.");
     }
 
     private void loginMember() {
